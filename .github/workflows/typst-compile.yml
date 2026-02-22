@@ -1,0 +1,61 @@
+name: Compile Typst files
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  compile-typst:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Typst
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: ^0.13.0
+
+      - name: Install template package
+        run: |
+          mkdir -p ~/.local/share/typst/packages/local
+          git clone https://github.com/alvinceleste2/chuletario-typst ~/.local/share/typst/packages/local/chuletario
+
+      - name: Compile specified Typst files
+        run: |
+          mkdir -p build
+          # ⚙️ Define aquí tus pares input → output:
+          declare -A files=(
+            ["ei/chuletario.typ"]="build/ei.pdf"
+          )
+
+          for input in "${!files[@]}"; do
+            output="${files[$input]}"
+            mkdir -p "$(dirname "$output")"
+            echo "Compilando $input → $output"
+            typst compile "$input" "$output"
+          done
+
+      - name: Push PDFs to dedicated branch
+        run: |
+          # Configurar Git
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # Crear rama pdfs o cambiar a ella
+          git checkout --orphan pdfs
+          git rm -rf .  # Limpiar todo excepto lo que vamos a añadir
+
+          # Copiar los PDFs
+          mkdir -p build
+          cp -r build/* .
+
+          # Commit y force push
+          git add *.pdf
+          git commit -m "Update compiled PDFs"
+          git push origin pdfs --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
