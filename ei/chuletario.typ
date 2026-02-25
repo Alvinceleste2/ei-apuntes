@@ -264,3 +264,106 @@ Por T.C.L., $sqrt(n) (overline(X) - mu) arrow^d N(0, sigma^2) <=> (sqrt(n) (over
 
   Equivalencia asintótica entre $S_(n-1)$ y $S_n$.
 ]
+
+Sea $X_1, X_2, ...$ una colección de v.a.i.i.d. con $EE(X_i) = mu$ y con $"Var"(X_i) = sigma^2 < oo$.
+Además, $EE[(X_i - mu)^4] < oo thick forall i = 1, ..., n$.
+
+#definition(title: [Coeficiente de Kurtosis])[
+  Dada $X$ v.a., se define el *coeficiente de kurtosis* como:
+  $ k = (EE[(X - mu)^4])/sigma^4 $
+]
+
+De forma intuitiva, un valor de $k>3$ implica que las colas de la distribución son más "pesadas" (t-Student).
+Por otro lado, un valor de $k<3$ implica que las colas de la distribución son más "ligeras" (uniforme).
+
+#theorem[
+  Sea $X_1, X_2, ...$ una colección de v.a.i.i.d. con $EE(X_i) = mu$ y con $"Var"(X_i) = sigma^2 < oo$.
+  Además, $EE[(X_i - mu)^4] < oo thick forall i = 1, ..., n$.
+  Entonces:
+  $
+    sqrt(n) (S_n^2 - sigma^2) arrow^d N(0, (k - 1) sigma^4)
+  $
+]
+
+#proof[
+  Definimos $Y_i = (X_i - mu)^2 thick forall i = 1, 2, ...$ tal que $EE(Y_i) = EE[(X_i - mu)^2] = sigma^2$.
+  Definimos también $overline(Y_n) = (sum_(i=1)^n Y_i)\/n$.
+  Como $EE[(X_i - mu)^4] = EE(Y_i^2) < oo$, se tiene que $"Var"(Y_i) < oo thick forall i$.
+  Aplicamos el T.C.L. a $Y_1, Y_2, ...$ y obtenemos:
+  $
+    sqrt(n)(overline(Y_n) - sigma^2) arrow^d N(0, "Var"(Y_i))
+  $
+
+  Calculamos:
+  $
+    "Var"(Y_i) = EE[Y_i^2] - EE[Y_i]^2 = EE[(X_i - mu)^4] - sigma^4 underbrace(=, k = (EE[(X-mu)^4])/sigma^4) sigma^4 (k - 1)
+  $
+
+  Por tanto, $sqrt(n) (overline(Y_n) - sigma^2) arrow^d N(0, sigma^4(k-1))$.
+  Ahora:
+  $
+    S_n^2 = (sum_(i=1)^n (X_i - overline(X))^2)/n = 1/n sum_(i=1)^n (X_i - mu)^2 - (overline(X) - mu)^2 = overline(Y_n) - (overline(X) - mu)^2
+  $
+
+  Luego:
+  $
+    sqrt(n) (S_n^2 - sigma^2) = sqrt(n) (overline(Y_n) - sigma^2) - sqrt(n) (overline(X) - mu)^2
+  $
+
+  Aplicando T.C.L. a la colección $X_1, X_2, ...$ tenemos $sqrt(n) (overline(X) - mu) arrow^d X$ con $X~N(0, sigma^2)$.
+  Por el teorema de la aplicación contina (en distribución) para $g(x)=x^2$:
+  $
+    [sqrt(n)(overline(X) - mu)]^2 arrow^d X^2
+  $
+
+  Observamos que
+  $
+    sqrt(n)(overline(X) - mu)^2 = ([sqrt(n)(overline(X) - mu)]^2)/(sqrt(n)) arrow^PP 0
+  $
+
+  Finalmente, por el lema de Slutsky se obtiene el resultado.
+]
+
+_Observaciones:_
++ Este teorema, además, nos dice que $"Var"(S_n^2) = ((k-1)sigma^4)\/n$ asintóticamente, es decir, para $n$ suficientemente grande.
++ En el caso de la población normal, se tiene que: $sqrt(n) (S_n^2 - sigma^2) arrow^d N(0, 2 sigma^4)$.
+
+#example[
+  Sea $X_1, X_2, ...$ v.a.i.i.d. de Bernoulli (p).
+  Entonces $mu = p, sigma^2 = p(1-p)$.
+  Calculamos:
+  $
+    EE[(X-mu)^4] = (1-p)^4 p + (0-p)^4 (1-p) = ... = p(1-p)(1-3p+3p^2) < oo
+  $
+  Así:
+  $
+    k = (EE[(X-mu)^4])/sigma^4 = (p(1-p)(1-3p+3p^2))/(p^2(1-p)^2) = ... = 1/(p(1-p)) - 3
+  $
+
+  Luego $(k-1)sigma^4 = ... = p(1-p)(1-2p)^2$. Entonces:
+  $
+    sqrt(n) (S_n^2 - sigma^2) arrow^d N(0, p(1-p)(1-2p)^2)
+  $
+
+  Calculamos $EE[(X-mu)^3] = (1-p)^3 p + (0-p)^3 (1-p) = ... = p(1-p)(1-2p)$.
+  Además, el coeficiente de asimetría (estandarizado) es:
+  $
+    (EE[(X-mu)^3])/sigma^3 = (1-2p)/(sqrt(p(1-p))) = gamma
+  $
+
+  Finalmente, llegamos a:
+  $
+    p(p-1)(1-2p)^2 = [p(1-p)]^2 gamma^2
+  $
+
+  #align(center)[
+    #table(
+      columns: 3,
+      align: center,
+      [p], [gamma], $p(1-p)(1-2p)^2$,
+      $0.5$, $0$, $0$,
+      $0.6$, $-0.408$, $0.0096$,
+      $0.9$, $-2.667$, $0.0576$,
+    )
+  ]
+]
